@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bs.poetry.dao.PoetDao">
+    <cache readOnly="true" size="500" flushInterval="120000" eviction="LRU"/>
+
+
+    <select id="selectPoetries" parameterType="int" resultType="com.bs.poetry.entity.Poetry">
+        select * from poetries where poet_id = #{id}
+    </select>
+    <resultMap id="poetsMap" type="com.bs.poetry.entity.Poet">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <collection property="poetries" javaType="ArrayList" column="id" ofType="com.bs.poetry.entity.Poetry" select="selectPoetries">
+            <result property="title" column="title"/>
+            <result property="content" column="content"/>
+        </collection>
+    </resultMap>
+    <select id="selectPoet" resultMap="poetsMap" parameterType="com.bs.poetry.entity.Poet">
+        select * from poets
+        <where>
+            name = #{name}
+        </where>
+    </select>
+</mapper>

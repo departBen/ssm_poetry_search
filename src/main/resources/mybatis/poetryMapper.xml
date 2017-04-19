@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bs.poetry.dao.PoetryDao">
+    <cache readOnly="true" size="500" flushInterval="120000" eviction="LRU"/>
+
+
+    <select id="sePoet" parameterType="int" resultType="com.bs.poetry.entity.Poet">
+        select * from poets where id = #{poet_id}
+    </select>
+    <resultMap id="poetryMap" type="com.bs.poetry.entity.Poetry">
+        <id property="id" column="id"/>
+        <result property="content" column="content"/>
+        <result property="title" column="title"/>
+        <association property="poet" column="poet_id" javaType="com.bs.poetry.entity.Poet" select="sePoet">
+            <result property="name" column="name"/>
+        </association>
+    </resultMap>
+    <!--分页查询-->
+    <select id="selectPoetry" resultMap="poetryMap" parameterType="com.bs.poetry.entity.Poetry">
+        select * from poetries
+        <where>
+            <if test="poet != ''  and poet != null">
+                poet_id = #{poet.id}
+            </if>
+            <if test="title != ''  and title != null">
+                title like #{title}
+            </if>
+            <if test="content != ''  and content != null">
+                content like #{content}
+            </if>
+            <if test="id > 0">
+                id = #{id}
+            </if>
+        </where>
+        <if test="start >= 0 and pageSize > 0">
+            limit #{start},#{pageSize}
+        </if>
+    </select>
+</mapper>
